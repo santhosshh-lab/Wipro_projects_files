@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random User Fetch</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f0f8ff;
+    }
+    #userCard {
+      margin: 20px auto;
+      width: 250px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    }
+    img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Fetch Random User</h2>
+  <button id="fetchUserBtn">Get Random User</button>
+
+  <div id="userCard"></div>
+
+  <script>
+    document.getElementById("fetchUserBtn").addEventListener("click", () => {
+      fetch("https://randomuser.me/api/")
+        .then(response => response.json())
+        .then(data => {
+          const user = data.results[0];
+          const userCard = `
+            <img src="${user.picture.large}" alt="User Picture">
+            <h3>${user.name.first} ${user.name.last}</h3>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Country:</strong> ${user.location.country}</p>
+          `;
+          document.getElementById("userCard").innerHTML = userCard;
+        })
+        .catch(error => {
+          document.getElementById("userCard").innerHTML = "<p>Error fetching user data.</p>";
+          console.error("Error:", error);
+        });
+    });
+  </script>
+
+</body>
+</html>

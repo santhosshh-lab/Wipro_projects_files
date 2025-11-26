@@ -1,0 +1,77 @@
+1.Question: Check Odd/Even
+Problem: Write a JavaScript function named checkOddEven that takes a number as a parameter and logs whether the number is odd or even to the console.
+
+Requirements:
+
+Define a function named checkOddEven that takes a parameter number.
+
+Log the result to the console.
+
+---------------------------ANSWER------------------------------------
+
+const checkOddEven = (number) => {
+  if (number % 2 === 0) {
+    console.log(`${number} is Even`);
+  } else {
+    console.log(`${number} is Odd`);
+  }
+};
+
+checkOddEven(10); 
+checkOddEven(7);  
+
+
+2.Question: Find Maximum Value
+Problem: Write a JavaScript function named findMax that takes an array of numbers as a parameter and returns the maximum value in the array.
+
+Solution: findMax
+There are several ways to solve this using ES6 features.
+
+Option 1: Using the Spread Operator (...) and Math.max()
+This is the most concise and idiomatic ES6 approach.
+
+------------------------------------ANSWER-----------------------------
+
+
+const findMax = (arr) => {
+  // Math.max() returns the largest of zero or more numbers.
+  // The spread operator (...) unpacks the elements of the array into 
+  // separate arguments for Math.max().
+  return Math.max(...arr); 
+};
+const numbers = [5, 12, 9, 30, 1];
+console.log(findMax(numbers)); // Output: 30
+
+3.Question: Repeat Character
+Problem: Write a function repeatCharacter(character, count) that takes a character and a number as input and returns a string with the character repeated the specified number of times.
+
+Hints:
+
+Declare a variable result and initialize it as an empty string.
+
+Use a for loop to iterate count times.
+
+In each iteration, append the character to the result string.
+
+Return the result string as the output of the function.
+
+(The question also mentions an inbuilt custom function getProgramInputs(), but since the core task is defining repeatCharacter, the solution below focuses on that function.)
+
+-------------------------------ANSWER----------------------------------
+const repeatCharacter = (character, count) => {
+  let result = ""; // Hint 1: Initialize an empty string
+  
+  // Hint 2: Use a for loop to iterate count times
+  for (let i = 0; i < count; i++) {
+    result += character; // Hint 3: Append the character
+  }
+  
+  return result; // Hint 4: Return the result
+};
+
+// Example Test Case:
+console.log(repeatCharacter('a', 5)); // Output: "aaaaa"
+console.log(repeatCharacter('*', 3)); // Output: "***"
+
+
+

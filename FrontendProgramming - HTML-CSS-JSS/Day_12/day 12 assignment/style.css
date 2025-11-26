@@ -1,0 +1,46 @@
+/* General Page Styling */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hero Section */
+.hero {
+  height: 60vh;
+  background: linear-gradient(rgba(0, 0, 100, 0.5), rgba(0, 0, 150, 0.5)),
+              url('https://images.unsplash.com/photo-1509062522246-3755977927d7') center/cover no-repeat;
+}
+
+/* Flexbox Layout */
+.container-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Card Styling */
+.card img {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.card {
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Footer */
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  font-size: 14px;
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <servlet>
+    <servlet-name>contact</servlet-name>
+    <servlet-class>app.ContactServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>contact</servlet-name>
+    <url-pattern>/add</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>contact</servlet-name>
+    <url-pattern>/list</url-pattern>
+  </servlet-mapping>
+</web-app>
