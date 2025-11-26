@@ -1,0 +1,176 @@
+Question 1
+Sort the Collection
+students are provided with a challenge to sort the given arraylist in the lesser lines of code. Student with minimum lines will win , try to write a code for it in less lines and win
+
+Input
+An arraylist of integers
+
+Output
+Sorted list
+
+Sample input
+1
+4
+5
+0
+
+output
+List before sort: [1, 4, 5, 0]
+List after sort: [0, 1, 4, 5]
+--------------------------------ANSWER--------------------------------------
+
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        ArrayList<Integer> list = new ArrayList<>();
+        while(sc.hasNextInt()) {
+            list.add(sc.nextInt());
+        }
+        System.out.println("List before sort: " + list);
+        Collections.sort(list);
+        System.out.println("List after sort: " + list);
+    }
+}
+
+Question 2
+generics
+Design a generic class Test to make the main work for Number classes, do not alter main class
+
+input :
+1
+
+output
+"the sum is = 50.0
+----------------------------------------ANSWER-------------------------
+
+import java.util.Scanner;
+
+
+public class Main
+{
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int choice=sc.nextInt();
+
+		switch(choice) {
+		case 1:
+			Test<Integer> t1 = new Test<Integer>();
+			t1.add(30, 20);
+			break;
+		case 2: 
+			Test<Double> t2 = new Test<Double>();
+			t2.add(10.0, 20.0);
+			break;
+		case 3: 
+			Test<Float> t3 = new Test<Float>();
+			t3.add(20.0f, 20.0f);
+			break;
+
+		}
+
+	}
+
+}
+class Test<T extends Number>{
+	void add(T a, T b){
+		double sum = a.doubleValue() + b.doubleValue();
+		System.out.println("the sum is = " + sum);
+	}
+  // complete this class
+  // implement add method accordingly
+}
+
+
+
+
+Question 3
+Hashmap
+Write a java program to remove an element from the Map, you can use the remove() method. This method takes the key value and
+
+removes the mapping for a key from this map if it is present in the map.
+
+Instruction- before running the program , give 4 string inputs and then the one  integer number which key you want to remove.
+keys should start from 1.
+
+Output- 
+Mappings of HashMap are : {1=sakshi, 2=kiran, 3=prashant, 4=kevon}
+Mappings after removal are : {1=sakshi, 2=kiran, 3=prashant}
+
+-------------------------------------------ANSWER-----------------------------
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        Scanner s = new Scanner(System.in);
+        // Read the whole line
+        String[] arr = s.nextLine().split("\\s+");
+        HashMap<Integer, String> map = new HashMap<>();
+
+        // First 4 strings
+        for (int i = 1; i <= 4; i++) {
+            map.put(i, arr[i-1]);
+        }
+        // The last entry is the integer key to remove
+        int keyToRemove = Integer.parseInt(arr[4]);
+
+        System.out.println("Mappings of HashMap are : " + map);
+        map.remove(keyToRemove);
+        System.out.println("Mappings after removal are : " + map);
+    }
+}
+
+Question 5
+Target Sum
+Rohan is given a task two return indices of pair whose sum will be equal to the given target.
+Only one such pair is required.
+
+Input Format
+
+size of the array
+array elements
+target
+
+Output Format
+index pair whose sum is equal to the target
+
+Input 
+4
+2 7 11 15
+9
+Output
+(0 , 1)
+Explanation
+Because nums[0] + nums[1] = 2 + 7 = 9
+
+-------------------------------------ANSWER---------------------------------
+import java.util.*;
+class TargetSum {
+    static int[] twoSum(int n, int[] nums, int target) {
+        for(int i = 0; i < n; i++) {
+            for(int j = i + 1; j < n; j++) {
+                if(nums[i] + nums[j] == target) {
+                    return new int[]{i, j};
+                }
+            }
+        }
+        return new int[]{-1, -1}; // if no pair found
+    }
+
+    public static void main (String[] args) {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        int[] nums = new int[n];
+        for(int i = 0; i < n; i++) {
+            nums[i] = in.nextInt();
+        }
+        int target = in.nextInt();
+
+        int[] ans = twoSum(n, nums, target);
+        System.out.println("(" + ans[0] + " , " + ans[1] + ")");
+    }
+}
+
+
+
+
+
