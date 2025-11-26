@@ -1,0 +1,236 @@
+Question 1
+oops rectangle
+Create a Java class called "Rectangle" that represents a rectangle shape. The class should have instance variables for the length and width of the rectangle. It should also have methods to calculate the area and perimeter of the rectangle. Write the Java class "Rectangle" according to the given specifications and demonstrate its usage by creating objects and invoking the methods.
+--------ANSWER---------------------------------
+import java.util.*;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        double length = sc.nextDouble();
+        double width = sc.nextDouble();
+
+        Rectangle rectangle1 = new Rectangle(length, width);
+        double area1 = rectangle1.calculateArea();
+        double perimeter1 = rectangle1.calculatePerimeter();
+
+        System.out.println("Rectangle 1: ");
+        System.out.println("Length: " + rectangle1.getLength());
+        System.out.println("Width: " + rectangle1.getWidth());
+        System.out.println("Area: " + area1);
+        System.out.println("Perimeter: " + perimeter1);
+    }
+}
+
+class Rectangle {
+    private double length;
+    private double width;
+
+    // Constructor
+    public Rectangle(double length, double width) {
+        this.length = length;
+        this.width = width;
+    }
+
+    // Getter methods
+    public double getLength() {
+        return length;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    // Method to calculate area
+    public double calculateArea() {
+        return length * width;
+    }
+
+    // Method to calculate perimeter
+    public double calculatePerimeter() {
+        return 2 * (length + width);
+    }
+}
+
+Question 2
+SuperClass
+Create a superClass Vehicle that has a method noOfWheels() of return type void and accepts no parameters. Create two subclasses Scooter and Car which has method noOfWheels()  
+
+noOfWheels() of Vehicle should display “No of wheels undefined”.
+
+noOfWheels() of Scooter should display “No of wheels 2”.
+
+noOfWheels() of Car should display “No of wheels 4”.
+
+--------------------------------ANSWER--------------------------------
+public class Main {
+    public static void main(String[] args) {
+        Vehicle v = new Vehicle();
+        Scooter s = new Scooter();
+        Car c = new Car();
+
+        v.noOfWheels();
+        s.noOfWheels();
+        c.noOfWheels();
+    }
+}
+
+class Vehicle {
+    void noOfWheels() {
+        System.out.println("No of wheels undefined");
+    }
+}
+
+class Scooter extends Vehicle {
+    void noOfWheels() {
+        System.out.println("No of wheels 2");
+    }
+}
+
+class Car extends Vehicle {
+    void noOfWheels() {
+        System.out.println("No of wheels 4");
+    }
+}
+Question 3
+bicycle and mountain bike
+your task is to implement two classes as shown in the diagram
+
+--------------------------------------------ANSWER-------------------------
+
+import java.util.Scanner;
+import java.util.*;
+
+public class Test {
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int x = sc.nextInt(); 
+        int y = sc.nextInt(); 
+        int z = sc.nextInt(); 
+
+        MountainBike mb = new MountainBike(x, y, z);
+        System.out.println(mb.toString());
+    }
+}
+
+class Bicycle {
+    public int gear;
+    public int speed;
+
+    public Bicycle(int gear, int speed) {
+        this.gear = gear;
+        this.speed = speed;
+    }
+
+    public void applyBrake(int decrement) {
+        speed -= decrement;
+    }
+
+    public void speedUp(int increment) {
+        speed += increment;
+    }
+
+    public String toString() {
+        return ("No of gears are " + gear + "\n"
+                + "speed of bicycle is " + speed);
+    }
+}
+
+class MountainBike extends Bicycle {
+    public int seatHeight;
+
+    public MountainBike(int gear, int speed, int startHeight) {
+        super(gear, speed);
+        seatHeight = startHeight;
+    }
+
+    public void setHeight(int newValue) {
+        seatHeight = newValue;
+    }
+
+    @Override
+    public String toString() {
+        return (super.toString() + "\nseat height is " + seatHeight);
+    }
+}
+
+Question 4
+Volume
+Write a program in java to exploit constructor overloading. (cube and cuboid volume calculation)
+
+i)  Create a class ThreeDimensionShape with three variables width, height, depth;
+
+ii)  Create three constructors
+
+a)     Doesn’t accepts any parameter
+
+b)     Accepts 1 parameter of type double(length)
+
+c)     Accepts 3 parameter of type double(width, height, depth)
+
+iii)  Create a method volume of type double that returns a product of width, height, and depth.
+
+iv)  in case of No argument constructor make length=width=depth = 0;
+
+v)  in case of 1 argument constructor make length=width=depth = length;
+
+---------------------------------------------ANSWER------------------------
+
+class Main {
+    public static void main(String args[]) {
+        // create boxes using the various constructors
+        ThreeDimensionShape shape1 = new ThreeDimensionShape(5, 6, 7);
+        ThreeDimensionShape shape2 = new ThreeDimensionShape();
+        ThreeDimensionShape shape3 = new ThreeDimensionShape(8);
+
+        double volume;
+
+        // get volume of first box
+        volume = shape1.volume();
+        System.out.println("Volume of shape1 is " + volume);
+
+        // get volume of second box
+        volume = shape2.volume();
+        System.out.println("Volume of shape2 is " + volume);
+
+        // get volume of cube
+        volume = shape3.volume();
+        System.out.println("Volume of shape3 is " + volume);
+    }
+}
+
+class ThreeDimensionShape {
+    double width, height, depth;
+
+    // constructor used when all dimensions are defined
+    ThreeDimensionShape(double w, double h, double d) {
+        width = w;
+        height = h;
+        depth = d;
+    }
+
+    // constructor used when one dimension is defined
+    ThreeDimensionShape(double l) {
+        width = height = depth = l;
+    }
+
+    // constructor used when no dimension is specified
+    ThreeDimensionShape() {
+        width = height = depth = 0;
+    }
+
+    // compute and return volume
+    double volume() {
+        return width * height * depth;
+    }
+}
+
+
+
+
+
+
+
+
+
+
