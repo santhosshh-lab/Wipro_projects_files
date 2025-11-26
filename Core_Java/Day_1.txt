@@ -1,7 +1,6 @@
 Question 1
-Marks: 1/1
 
-7. Arithmetic Operators in Java
+1. Arithmetic Operators in Java
 Instructions:
 
 Write a program that takes two numbers as input from the user and performs arithmetic operations on them using the arithmetic operators (sum, difference, product, quotient, remainder) in Java.
