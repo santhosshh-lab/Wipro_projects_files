@@ -1,0 +1,50 @@
+package com.userservice.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.userservice.entity.User;
+import com.userservice.repo.UserRepository;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository repo;
+
+    public User register(User u) {
+        return repo.save(u);
+    }
+
+    public List<User> getAll() {
+        return repo.findAll();
+    }
+
+    public User getById(Long id) {
+        return repo.findById(id).orElseThrow();
+    }
+
+    public User update(Long id, User u) {
+        User old = repo.findById(id).orElseThrow();
+
+        old.setUsername(u.getUsername());
+        old.setEmail(u.getEmail());
+        old.setPassword(u.getPassword());
+
+        return repo.save(old);
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
+    }
+
+    public User login(String email, String password) {
+        User u = repo.findByEmail(email);
+        if (u != null && u.getPassword().equals(password)) {
+            return u;
+        }
+        return null;
+    }
+}

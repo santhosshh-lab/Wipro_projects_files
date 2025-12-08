@@ -1,0 +1,37 @@
+body {
+    background: #121212;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+}
+
+.form-box, .center-box {
+    width: 330px;
+    margin: auto;
+    margin-top: 80px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 8px;
+    border: none;
+    background: #00d4ff;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input {
+    width: 85%;
+    padding: 10px;
+    margin: 8px;
+    border-radius: 5px;
+}
+
+.card {
+    width: 300px;
+    background: #1e1e1e;
+    padding: 15px;
+    margin: 10px auto;
+    border-radius: 8px;
+}

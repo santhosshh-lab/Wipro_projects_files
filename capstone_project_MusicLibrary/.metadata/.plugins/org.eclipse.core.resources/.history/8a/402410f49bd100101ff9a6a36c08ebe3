@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Home</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<h2>Welcome 🎧</h2>
+
+<div class="center-box">
+    <button onclick="location.href='/songs'">🎵 View Songs</button>
+    <button onclick="location.href='/playlists'">📂 My Playlists</button>
+</div>
+
+</body>
+</html>

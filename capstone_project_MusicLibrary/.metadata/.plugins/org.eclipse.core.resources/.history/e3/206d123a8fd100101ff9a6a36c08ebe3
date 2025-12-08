@@ -1,0 +1,69 @@
+package com.userservice.controller;
+
+import com.userservice.dto.SongDto;
+import com.userservice.entity.Playlist;
+import com.userservice.entity.PlaylistSong;
+import com.userservice.service.PlaylistService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/users/{userId}/playlists")
+public class PlaylistController {
+
+    @Autowired
+    private PlaylistService service;
+
+    // CREATE PLAYLIST
+    @PostMapping
+    public Playlist createPlaylist(@PathVariable Long userId, @RequestBody Playlist p) {
+        return service.createPlaylist(userId, p);
+    }
+
+    // GET ALL PLAYLISTS OF USER
+    @GetMapping
+    public List<Playlist> getPlaylists(@PathVariable Long userId) {
+        return service.getUserPlaylists(userId);
+    }
+
+    // UPDATE
+    @PutMapping("/{playlistId}")
+    public Playlist updatePlaylist(@PathVariable Long userId,
+                                   @PathVariable Long playlistId,
+                                   @RequestBody Playlist p) {
+        return service.updatePlaylist(userId, playlistId, p);
+    }
+
+    // DELETE
+    @DeleteMapping("/{playlistId}")
+    public String deletePlaylist(@PathVariable Long userId,
+                                 @PathVariable Long playlistId) {
+        return service.deletePlaylist(userId, playlistId);
+    }
+
+    // ADD SONG
+    @PostMapping("/{playlistId}/songs")
+    public PlaylistSong addSong(@PathVariable Long userId,
+                                @PathVariable Long playlistId,
+                                @RequestBody Map<String, Long> body) {
+        Long songId = body.get("songId");
+        return service.addSong(userId, playlistId, songId);
+    }
+
+    // REMOVE SONG
+    @DeleteMapping("/{playlistId}/songs/{songId}")
+    public String removeSong(@PathVariable Long playlistId,
+                             @PathVariable Long songId) {
+        return service.removeSong(playlistId, songId);
+    }
+
+    // VIEW SONGS IN PLAYLIST
+    @GetMapping("/{playlistId}/songs")
+    public List<SongDto> getSongs(@PathVariable Long playlistId) {
+        return service.getSongsInPlaylist(playlistId);
+    }
+}

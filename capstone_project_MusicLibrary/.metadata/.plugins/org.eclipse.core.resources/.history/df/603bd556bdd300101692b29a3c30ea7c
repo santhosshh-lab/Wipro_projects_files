@@ -1,0 +1,299 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Playlists</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background:#f8fafc; font-family: Inter, system-ui; padding-bottom:120px; }
+    .card { border-radius: 12px; }
+    #musicPlayer { box-shadow: 0 -4px 12px rgba(0,0,0,.3); }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand bg-white mb-4 shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="user-songs.html">🎵 My Playlists</a>
+    <div>
+      <button id="logout" class="btn btn-sm btn-danger">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div id="msg"></div>
+
+  <!-- CREATE PLAYLIST -->
+  <div class="card p-3 mb-3">
+    <div class="d-flex">
+      <input id="name" class="form-control me-2" placeholder="Enter playlist name">
+      <button id="create" class="btn btn-primary">Create</button>
+    </div>
+  </div>
+
+  <!-- LIST ALL PLAYLISTS -->
+  <div id="playlists" class="row g-3"></div>
+
+</div>
+
+
+<!-- 🎵 MUSIC PLAYER UI (BOTTOM BAR) -->
+<div class="fixed-bottom bg-dark text-white p-3" id="musicPlayer" style="display:none;">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <strong id="playerTitle">Song Name</strong>
+      <div id="playerSinger" class="text-muted small">Singer</div>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-light btn-sm" onclick="prevSong()">⏮</button>
+      <button class="btn btn-primary btn-sm" id="playPauseBtn" onclick="togglePlay()">▶</button>
+      <button class="btn btn-light btn-sm" onclick="nextSong()">⏭</button>
+      <button class="btn btn-warning btn-sm" onclick="shufflePlay()">🔀</button>
+    </div>
+  </div>
+
+  <input type="range" id="seekBar" class="form-range mt-2" value="0">
+</div>
+
+<audio id="audioPlayer"></audio>
+
+
+<script>
+const API = "http://localhost:9000";
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+if (!user.id) {
+  alert("Please login");
+  location.href = "user-login.html";
+}
+
+const uid = user.id;
+
+// ========================================
+// LOAD ALL PLAYLISTS
+// ========================================
+async function loadPlaylists() {
+  try {
+    const res = await fetch(`${API}/users/${uid}/playlists`);
+    const data = await res.json();
+
+    document.getElementById("playlists").innerHTML = data.map(p => `
+      <div class="col-md-6">
+        <div class="card p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${p.name}</strong>
+              <div class="text-muted small">${p.description || ""}</div>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-outline-primary me-2" onclick="openPlaylist(${p.id})">Open</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deletePlaylist(${p.id})">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+  } catch (err) {
+    document.getElementById("msg").innerHTML =
+      `<div class="alert alert-danger">Failed to load playlists</div>`;
+  }
+}
+
+
+// ========================================
+// CREATE PLAYLIST
+// ========================================
+document.getElementById("create").addEventListener("click", async () => {
+  const name = document.getElementById("name").value.trim();
+  if (!name) return alert("Please enter a playlist name");
+
+  await fetch(`${API}/users/${uid}/playlists`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, description: "" })
+  });
+
+  document.getElementById("name").value = "";
+  loadPlaylists();
+});
+
+
+// ========================================
+// DELETE PLAYLIST
+// ========================================
+async function deletePlaylist(pid) {
+  if (!confirm("Delete this playlist?")) return;
+
+  await fetch(`${API}/users/${uid}/playlists/${pid}`, {
+    method: "DELETE"
+  });
+
+  loadPlaylists();
+}
+
+
+// ========================================
+// OPEN PLAYLIST IN POPUP WINDOW
+// ========================================
+async function openPlaylist(pid) {
+  const w = window.open("", "_blank");
+
+  const res = await fetch(`${API}/users/${uid}/playlists/${pid}/songs`);
+  const songs = await res.json();
+
+  let songsHtml = "";
+
+  songs.forEach((s, i) => {
+    songsHtml += `
+      <div class="card p-2 mb-2">
+        <strong>${s.name}</strong> - ${s.singer || ""}
+        <div class="mt-2 d-flex gap-2">
+          <button class="btn btn-sm btn-primary" onclick="window.opener.playSong(${i})">▶ Play</button>
+          <button class="btn btn-sm btn-danger"
+            onclick="window.opener.removeSongFromPlaylist(${pid}, ${s.id}); window.location.reload();">
+            Remove
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  const html = `
+    <html>
+      <head>
+        <title>Playlist ${pid}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      </head>
+      <body>
+        <div class="container p-3">
+          <h4>Playlist ${pid}</h4>
+          ${songsHtml || "<p class='text-muted'>No songs added yet.</p>"}
+        </div>
+      </body>
+    </html>
+  `;
+
+  // Write popup content
+  w.document.write(html);
+
+  // Load queue for player
+  loadPlaylistSongs(pid);
+}
+
+
+// ========================================
+// REMOVE SONG FROM PLAYLIST
+// ========================================
+async function removeSongFromPlaylist(pid, songId) {
+  await fetch(`${API}/users/${uid}/playlists/${pid}/songs/${songId}`, {
+    method: "DELETE"
+  });
+}
+
+
+// ========================================
+// 🎵 MUSIC PLAYER FUNCTIONS
+// ========================================
+let playIndex = 0;
+let playQueue = [];
+let shuffle = false;
+
+const audio = document.getElementById("audioPlayer");
+const player = document.getElementById("musicPlayer");
+const title = document.getElementById("playerTitle");
+const singer = document.getElementById("playerSinger");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const seekBar = document.getElementById("seekBar");
+
+function getAudioUrl(song) {
+  return song.audioUrl || 
+    "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars3.wav";
+}
+
+async function loadPlaylistSongs(pid) {
+  const data = await (await fetch(`${API}/users/${uid}/playlists/${pid}/songs`)).json();
+  playQueue = data;
+  playIndex = 0;
+}
+
+function playSong(i) {
+  if (!playQueue.length) return alert("No songs to play");
+
+  playIndex = i;
+
+  const song = playQueue[playIndex];
+  title.textContent = song.name;
+  singer.textContent = song.singer || "";
+
+  audio.src = getAudioUrl(song);
+  audio.play();
+
+  player.style.display = "block";
+  playPauseBtn.textContent = "⏸";
+}
+
+function togglePlay() {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶";
+  }
+}
+
+function nextSong() {
+  if (shuffle) {
+    playIndex = Math.floor(Math.random() * playQueue.length);
+  } else {
+    playIndex = (playIndex + 1) % playQueue.length;
+  }
+  playSong(playIndex);
+}
+
+function prevSong() {
+  playIndex = (playIndex - 1 + playQueue.length) % playQueue.length;
+  playSong(playIndex);
+}
+
+function shufflePlay() {
+  shuffle = !shuffle;
+  alert(shuffle ? "Shuffle ON" : "Shuffle OFF");
+}
+
+audio.addEventListener("ended", nextSong);
+
+audio.addEventListener("timeupdate", () => {
+  if (audio.duration) {
+    seekBar.value = (audio.currentTime / audio.duration) * 100;
+  }
+});
+
+seekBar.addEventListener("input", () => {
+  audio.currentTime = (seekBar.value / 100) * audio.duration;
+});
+
+
+// ========================================
+// LOGOUT
+// ========================================
+document.getElementById("logout").addEventListener("click", () => {
+  localStorage.removeItem("user");
+  location.href = "user-login.html";
+});
+
+
+// INITIAL LOAD
+loadPlaylists();
+
+</script>
+
+</body>
+</html>

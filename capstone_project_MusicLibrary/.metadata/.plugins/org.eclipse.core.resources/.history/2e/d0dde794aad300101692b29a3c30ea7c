@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Playlists</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f8fafc; font-family: Inter, system-ui; }
+    .card { border-radius: 12px; }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand bg-white mb-4 shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="user-songs.html">🎵 My Playlists</a>
+    <div>
+      <button id="logout" class="btn btn-sm btn-danger">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div id="msg"></div>
+
+  <!-- CREATE PLAYLIST -->
+  <div class="card p-3 mb-3">
+    <div class="d-flex">
+      <input id="name" class="form-control me-2" placeholder="Enter playlist name">
+      <button id="create" class="btn btn-primary">Create</button>
+    </div>
+  </div>
+
+  <!-- LIST ALL PLAYLISTS -->
+  <div id="playlists" class="row g-3"></div>
+
+</div>
+
+<script>
+const API = "http://localhost:9000";
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+if (!user.id) {
+  alert("Please login");
+  location.href = "user-login.html";
+}
+
+const uid = user.id;
+
+// ==========================
+// LOAD ALL PLAYLISTS
+// ==========================
+async function loadPlaylists() {
+  try {
+    const res = await fetch(`${API}/users/${uid}/playlists`);
+    const data = await res.json();
+
+    document.getElementById("playlists").innerHTML = data.map(p => `
+      <div class="col-md-6">
+        <div class="card p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${p.name}</strong>
+              <div class="text-muted small">${p.description || ""}</div>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-outline-primary me-2" onclick="openPlaylist(${p.id})">Open</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deletePlaylist(${p.id})">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+  } catch (err) {
+    document.getElementById("msg").innerHTML =
+      `<div class="alert alert-danger">Failed to load playlists</div>`;
+  }
+}
+
+// ==========================
+// CREATE PLAYLIST
+// ==========================
+document.getElementById("create").addEventListener("click", async () => {
+  const name = document.getElementById("name").value.trim();
+  if (!name) return alert("Please enter a playlist name");
+
+  const body = { name, description: "" };
+
+  await fetch(`${API}/users/${uid}/playlists`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  document.getElementById("name").value = "";
+  loadPlaylists();
+});
+
+// ==========================
+// DELETE PLAYLIST
+// ==========================
+async function deletePlaylist(pid) {
+  if (!confirm("Delete this playlist?")) return;
+
+  await fetch(`${API}/users/${uid}/playlists/${pid}`, { method: "DELETE" });
+  loadPlaylists();
+}
+
+// ==========================
+// OPEN PLAYLIST IN NEW WINDOW
+// (NO TEMPLATE LITERAL ERRORS)
+// ==========================
+async function openPlaylist(pid) {
+  const w = window.open("", "_blank");
+
+  // Fetch songs in this playlist
+  const res = await fetch(`${API}/users/${uid}/playlists/${pid}/songs`);
+  const songs = await res.json();
+
+  let songsHtml = "";
+
+  songs.forEach(s => {
+    songsHtml += `
+      <div class="card p-2 mb-2">
+        <strong>${s.name}</strong> - ${s.singer || ""}
+        <div class="mt-2">
+          <button class="btn btn-sm btn-danger"
+            onclick="window.opener.removeSongFromPlaylist(${pid}, ${s.id}); window.location.reload();">
+            Remove
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  const html = `
+    <html>
+      <head>
+        <title>Playlist ${pid}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      </head>
+      <body>
+        <div class="container p-3">
+          <h4>Playlist ${pid}</h4>
+          ${songsHtml || "<p class='text-muted'>No songs added yet.</p>"}
+        </div>
+      </body>
+    </html>
+  `;
+
+  w.document.write(html);
+}
+
+// ==========================
+// REMOVE SONG (CALLED FROM POPUP WINDOW)
+// ==========================
+async function removeSongFromPlaylist(pid, songId) {
+  await fetch(`${API}/users/${uid}/playlists/${pid}/songs/${songId}`, {
+    method: "DELETE"
+  });
+}
+
+// ==========================
+// LOGOUT
+// ==========================
+document.getElementById("logout").addEventListener("click", () => {
+  localStorage.removeItem("user");
+  location.href = "user-login.html";
+});
+
+// ==========================
+// INITIAL LOAD
+// ==========================
+loadPlaylists();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+package com.userservice.service;
+
+import com.userservice.entity.User;
+import com.userservice.repo.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository repo;
+
+    public User register(User u) {
+        return repo.save(u);
+    }
+
+    public User login(String email, String password) {
+        User user = repo.findByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("Email not found");
+        }
+        if (!user.getPassword().equals(password)) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        return user;
+    }
+
+    public List<User> getAll() {
+        return repo.findAll();
+    }
+
+    public User getById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public User update(Long id, User updated) {
+        User existing = getById(id);
+
+        existing.setEmail(updated.getEmail());
+        existing.setPassword(updated.getPassword());
+        existing.setPhone(updated.getPhone());
+
+        return repo.save(existing);
+    }
+
+    public void delete(Long id) {
+        repo.deleteById(id);
+    }
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Playlists</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<h2>My Playlists</h2>
+
+<input id="pname" placeholder="Playlist Name">
+<input id="pdesc" placeholder="Description">
+<button onclick="createPlaylist()">Create</button>
+
+<div id="list"></div>
+
+<script>
+let userId = localStorage.getItem("userId");
+
+async function load() {
+    let res = await fetch(`http://localhost:8081/users/${userId}/playlists`);
+    let data = await res.json();
+
+    let html = "";
+    data.forEach(p => {
+        html += `
+            <div class="card">
+                <h3>${p.name}</h3>
+                <button onclick="openPlaylist(${p.id})">Open</button>
+            </div>`;
+    });
+
+    document.getElementById("list").innerHTML = html;
+}
+
+async function createPlaylist() {
+    let data = {
+        name: document.getElementById("pname").value,
+        description: document.getElementById("pdesc").value
+    };
+
+    await fetch(`http://localhost:8081/users/${userId}/playlists`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    load();
+}
+
+function openPlaylist(id) {
+    localStorage.setItem("playlistId", id);
+    window.location.href = "/playlist/details";
+}
+
+load();
+</script>
+
+</body>
+</html>

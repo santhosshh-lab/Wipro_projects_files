@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><title>Manage Users</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>body{background:#f7fafc;font-family:Inter,system-ui}.topbar{background:white;padding:12px;border-radius:10px}</style>
+</head>
+<body>
+<nav class="navbar navbar-expand bg-white mb-4 shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="admin-dashboard.html">Admin - Users</a>
+    <div class="d-flex">
+      <a class="btn btn-sm btn-outline-secondary me-2" href="admin-songs.html">Manage Songs</a>
+      <button id="logout" class="btn btn-sm btn-danger">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div id="msg"></div>
+  <div class="card p-3 mb-3">
+    <div class="row">
+      <div class="col-md-8">
+        <input id="search" placeholder="Search users by name or email" class="form-control" />
+      </div>
+      <div class="col-md-4 text-end">
+        <button class="btn btn-success" id="btnCreate">Create User</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tableWrap" class="card p-3">
+    <table class="table table-hover">
+      <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal" tabindex="-1" id="userModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="userForm">
+        <div class="modal-header"><h5 class="modal-title" id="modalTitle">Create User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="userId">
+          <div class="mb-2"><label>Username</label><input id="username" class="form-control" required></div>
+          <div class="mb-2"><label>Email</label><input id="email" type="email" class="form-control" required></div>
+          <div class="mb-2"><label>Phone</label><input id="phone" class="form-control"></div>
+          <div class="mb-2"><label>Password</label><input id="password" type="password" class="form-control"></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary">Save</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = "http://localhost:9000";
+const tbody = document.getElementById('tbody');
+const modalElem = new bootstrap.Modal(document.getElementById('userModal'));
+const userForm = document.getElementById('userForm');
+
+async function load(q='') {
+  try {
+    const url = q ? `${API}/admin/users/search?q=${encodeURIComponent(q)}` : `${API}/admin/users`;
+    const res = await fetch(url); const data = await res.json();
+    tbody.innerHTML = data.map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td>${u.username||''}</td>
+        <td>${u.email||''}</td>
+        <td>${u.phone||''}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="edit(${u.id})">Edit</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="del(${u.id})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    document.getElementById('msg').innerHTML = `<div class="alert alert-danger">Load failed: ${e.message||e}</div>`;
+  }
+}
+
+window.edit = async (id) => {
+  const u = await (await fetch(`${API}/admin/users/${id}`)).json();
+  document.getElementById('modalTitle').innerText = 'Edit User';
+  document.getElementById('userId').value = u.id;
+  document.getElementById('username').value = u.username||'';
+  document.getElementById('email').value = u.email||'';
+  document.getElementById('phone').value = u.phone||'';
+  document.getElementById('password').value = '';
+  modalElem.show();
+}
+
+window.del = async (id) => {
+  if(!confirm('Delete this user?')) return;
+  await fetch(`${API}/admin/users/${id}`, { method:'DELETE' });
+  load();
+}
+
+document.getElementById('btnCreate').addEventListener('click', () => {
+  document.getElementById('modalTitle').innerText = 'Create User';
+  document.getElementById('userId').value = '';
+  document.getElementById('username').value = '';
+  document.getElementById('email').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('password').value = '';
+  modalElem.show();
+});
+
+userForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('userId').value;
+  const payload = {
+    username: document.getElementById('username').value,
+    email: document.getElementById('email').value,
+    phone: document.getElementById('phone').value,
+    password: document.getElementById('password').value || undefined
+  };
+  if(!id) {
+    // create via admin endpoint
+    await fetch(API + '/admin/users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  } else {
+    await fetch(API + '/admin/users/' + id, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  }
+  modalElem.hide(); load();
+});
+
+document.getElementById('logout').addEventListener('click', ()=>{ localStorage.removeItem('admin'); location.href='admin-login.html'; });
+document.getElementById('search').addEventListener('input', (e)=> load(e.target.value));
+load();
+</script>
+</body>
+</html>

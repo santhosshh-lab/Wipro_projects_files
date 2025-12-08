@@ -1,0 +1,18 @@
+package com.gateway.security;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtUtil {
+
+    private final String SECRET = "SANDY_SECRET_KEY";  // SAME SECRET USED IN ADMIN + USER SERVICE
+
+    public Claims validateToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+}

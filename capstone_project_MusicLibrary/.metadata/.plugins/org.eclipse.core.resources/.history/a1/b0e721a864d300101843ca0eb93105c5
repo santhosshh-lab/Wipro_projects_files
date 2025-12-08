@@ -1,0 +1,29 @@
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.gateway.security.JwtAuthFilter;
+
+@Configuration
+public class GatewayConfig {
+
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+
+            .route("user-service", r -> r.path("/user/**")
+                    .filters(f -> f.filter(jwtAuthFilter))
+                    .uri("lb://USER-SERVICE"))
+
+            .route("admin-service", r -> r.path("/admin/**")
+                    .filters(f -> f.filter(jwtAuthFilter))
+                    .uri("lb://ADMIN-SERVICE"))
+
+            .build();
+    }
+}

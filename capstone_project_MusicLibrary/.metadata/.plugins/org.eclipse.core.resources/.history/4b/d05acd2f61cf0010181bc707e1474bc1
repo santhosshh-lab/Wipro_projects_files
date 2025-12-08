@@ -1,0 +1,10 @@
+package com.userservice.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.userservice.entity.Playlist;
+
+import java.util.List;
+
+public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
+    List<Playlist> findByUserId(Long userId);
+}

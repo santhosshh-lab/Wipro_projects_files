@@ -1,0 +1,26 @@
+package com.userservice.controller;
+
+import com.userservice.entity.Playlist;
+import com.userservice.repo.PlaylistRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/playlists")
+public class PlaylistController {
+
+    @Autowired
+    private PlaylistRepository playlistRepository;
+
+    @PostMapping
+    public Playlist create(@RequestBody Playlist playlist) {
+        return playlistRepository.save(playlist);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Playlist> getUserPlaylists(@PathVariable Long userId) {
+        return playlistRepository.findByUserId(userId);
+    }
+}

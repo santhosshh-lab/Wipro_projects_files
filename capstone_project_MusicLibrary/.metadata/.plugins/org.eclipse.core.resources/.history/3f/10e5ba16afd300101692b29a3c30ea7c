@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>body{font-family:Inter,system-ui;background:#f4f6fb} .topbar{background:white;padding:12px 20px;border-radius:10px}</style>
+</head>
+<body>
+<nav class="navbar navbar-expand bg-white mb-4 shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Music Library - Admin</a>
+    <div class="d-flex">
+      <a class="btn btn-sm btn-outline-secondary me-2" href="admin-users.html">Manage Users</a>
+      <a class="btn btn-sm btn-outline-secondary me-2" href="admin-songs.html">Manage Songs</a>
+      <button id="logout" class="btn btn-sm btn-danger">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div id="alerts"></div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h6 class="text-muted">Total Users</h6>
+        <div id="usersCount" class="fs-3">—</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h6 class="text-muted">Total Songs</h6>
+        <div id="songsCount" class="fs-3">—</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h6 class="text-muted">Visible Songs</h6>
+        <div id="visibleCount" class="fs-3">—</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+  <div class="card p-3">
+    <h5>Quick Actions</h5>
+    <div class="d-flex gap-2 mt-3">
+      <a href="admin-users.html" class="btn btn-primary">Open Users</a>
+      <a href="admin-songs.html" class="btn btn-warning">Open Songs</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:9000";
+const alerts = id => document.getElementById(id);
+async function fetchCounts() {
+  try {
+    const users = await (await fetch(API + '/admin/users')).json();
+    const songs = await (await fetch(API + '/songs')).json();
+    const visible = await (await fetch(API + '/songs/visible')).json();
+    document.getElementById('usersCount').innerText = Array.isArray(users) ? users.length : 0;
+    document.getElementById('songsCount').innerText = Array.isArray(songs) ? songs.length : 0;
+    document.getElementById('visibleCount').innerText = Array.isArray(visible) ? visible.length : 0;
+  } catch(e) {
+    alerts('alerts').innerHTML = `<div class="alert alert-danger">Unable to load dashboard: ${e.message || e}</div>`;
+  }
+}
+document.getElementById('logout').addEventListener('click', ()=>{ localStorage.removeItem('admin'); window.location.href='admin-login.html';});
+fetchCounts();
+</script>
+</body>
+</html>
